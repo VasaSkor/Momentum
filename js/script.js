@@ -6,4 +6,14 @@ function showTime() {
     setTimeout(showTime, 1000);
     return time
   }
-  showTime();
+function showDate(){
+  const date_block = document.querySelector('.date')
+  const date = new Date()
+  const options = {weekday: 'long', month: 'long', day: 'numeric'}
+  const currentDate = date.toLocaleDateString('en-US', options);
+  date_block.textContent = currentDate
+  setTimeout(showDate, 1000);
+  return date_block
+}
+  showTime()
+  showDate()
