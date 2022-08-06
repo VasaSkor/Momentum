@@ -1,5 +1,6 @@
-const bodyBackground = document.querySelector('body')
-bodyBackground.style.backgroundImage = "url('https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/evening/18.jpg')";
+let randomNum = Math.floor(Math.random() * 20 + 1).toString().padStart(2, '0')
+let slideNext = document.querySelector('.slide-next')
+let slidePreview = document.querySelector('.slide-prev')
 function showTime() {
     const time = document.querySelector('.time')
     const date = new Date()
@@ -49,8 +50,53 @@ function getLocalStorage() {
   }
 }
 
+const getRandomBackgroundImage = () => {
+const date = new Date()
+const GetHours = date.getHours()
+const image = new Image()
+let index = randomNum.toString().padStart(2, '0')
+if(GetHours >= 6 && GetHours <= 11){
+image.src = `https://raw.githubusercontent.com/VasaSkor/Momentum_background/assets/images/morning/${index}.jpg`
+image.onload = () =>
+    document.querySelector('body').style.backgroundImage = `url(${image.src})`
+}
+else if(GetHours >= 12 && GetHours <= 17){
+  image.src = `https://raw.githubusercontent.com/VasaSkor/Momentum_background/assets/images/afternoon/${index}.jpg`
+    image.onload = () =>
+        document.querySelector('body').style.backgroundImage = `url(${image.src})`
+}
+else if(GetHours >= 18 && GetHours <= 23){
+  image.src = `https://raw.githubusercontent.com/VasaSkor/Momentum_background/assets/images/evening/${index}.jpg`
+    image.onload = () =>
+        document.querySelector('body').style.backgroundImage = `url(${image.src})`
+}
+else if(GetHours >= 0 && GetHours <= 5){
+  image.src = `https://raw.githubusercontent.com/VasaSkor/Momentum_background/assets/images/night/${index}.jpg`
+    image.onload = () =>
+        document.querySelector('body').style.backgroundImage = `url(${image.src})`
+}
+}
+
+const getSlideNext = () =>{
+  randomNum++
+  if (randomNum > 20)
+    randomNum = 1
+    getRandomBackgroundImage()
+}
+const getSlidePrev = () =>{
+  randomNum--
+  if(randomNum < 1)
+     randomNum = 20
+     getRandomBackgroundImage()
+}
+
   window.addEventListener('beforeunload', setLocalStorage)
   window.addEventListener('load', getLocalStorage)
+  window.onload = () => {
+  document.querySelector('body').style.backgroundImage = getRandomBackgroundImage()
+}
+  slideNext.addEventListener('click', getSlideNext)
+  slidePreview.addEventListener('click', getSlidePrev)
   showTime()
   showDate()
   showGreetings()
