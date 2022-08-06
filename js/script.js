@@ -1,6 +1,14 @@
 let randomNum = Math.floor(Math.random() * 20 + 1).toString().padStart(2, '0')
 let slideNext = document.querySelector('.slide-next')
 let slidePreview = document.querySelector('.slide-prev')
+const weatherIcon = document.querySelector('.weather-icon')
+const temperature = document.querySelector('.temperature')
+const weatherDescription = document.querySelector('.weather-description')
+const windSpeed = document.querySelector('.wind')
+const humidity = document.querySelector('.humidity')
+const cityInput = document.querySelector('.city')
+cityInput.value = 'Minsk'
+const weatherError = document.querySelector('.weather-error')
 function showTime() {
     const time = document.querySelector('.time')
     const date = new Date()
@@ -9,6 +17,7 @@ function showTime() {
     setTimeout(showTime, 1000);
     return time
   }
+
 function showDate(){
   const date_block = document.querySelector('.date')
   const date = new Date()
@@ -90,13 +99,62 @@ const getSlidePrev = () =>{
      getRandomBackgroundImage()
 }
 
+cityInput.onkeypress = async (event) => {
+  if(!event)
+      event = window.event
+
+  if (event.key === 'Enter')
+  {
+      cityInput.value = cityInput.value.split('').map((e, i) => i === 0 ? e.toUpperCase() : e.toLowerCase()).join('')
+
+      localStorage.setItem('city', cityInput.value)
+      await getWeather()
+  }
+}
+
+async function getWeather() {  
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput.value}&lang=en&appid=08f2a575dda978b9c539199e54df03b0&units=metric`;
+  const res = await fetch(url);
+  const data = await res.json(); 
+  if(res.ok){
+  weatherError.textContent = ''
+  weatherIcon.className = 'weather-icon owf'
+  weatherIcon.classList.add(`owf-${data.weather[0].id}`)
+  temperature.textContent = `${Math.floor(data.main.temp)}°C`
+  weatherDescription.textContent = data.weather[0].description
+  windSpeed.textContent = `Wind speed: ${Math.floor(data.wind.speed)} m/s`
+  humidity.textContent = `Humidity: ${Math.floor(data.main.humidity)}%`
+}
+  else{
+        weatherError.textContent = `Error! city not found for '${localStorage.getItem('city')}'!`
+        weatherIcon.classList = `weather-icon owf`
+        temperature.textContent = ''
+        weatherDescription.textContent = ''
+        windSpeed.textContent = ''
+        humidity.textContent = ''
+  }
+}
+
+
   window.addEventListener('beforeunload', setLocalStorage)
   window.addEventListener('load', getLocalStorage)
+  window.addEventListener('load', () => {
+    setTimeout(async () => {
+        const storedCity = localStorage.getItem('city').trim()
+
+        if (storedCity)
+            cityInput.value = storedCity
+
+        await getWeather()
+    }, 1000)
+})
   window.onload = () => {
   document.querySelector('body').style.backgroundImage = getRandomBackgroundImage()
 }
+
   slideNext.addEventListener('click', getSlideNext)
   slidePreview.addEventListener('click', getSlidePrev)
   showTime()
   showDate()
   showGreetings()
+  getWeather()
