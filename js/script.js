@@ -9,6 +9,11 @@ const humidity = document.querySelector('.humidity')
 const cityInput = document.querySelector('.city')
 cityInput.value = 'Minsk'
 const weatherError = document.querySelector('.weather-error')
+const quoteText = document.querySelector('.quote')
+const quoteAuthor = document.querySelector('.author')
+const quoteChangeButton = document.querySelector('.change-quote')
+let quotes = ''
+
 function showTime() {
     const time = document.querySelector('.time')
     const date = new Date()
@@ -134,7 +139,28 @@ async function getWeather() {
         humidity.textContent = ''
   }
 }
+function updateQuote() {
+  const quote = quotes[Math.floor(Math.random() * quotes.length)]
 
+  quoteText.textContent = `"${quote['quote']}"`
+  quoteAuthor.textContent = quote['author']
+}
+
+async function getQuotes() {
+  const response = await fetch('https://www.breakingbadapi.com/api/quotes')
+
+  if (response.ok){
+      return response.json()
+  }
+}
+
+window.addEventListener('load', async () => {
+  quotes = await getQuotes()
+
+  updateQuote()
+})
+
+quoteChangeButton.addEventListener('click', updateQuote)
 
   window.addEventListener('beforeunload', setLocalStorage)
   window.addEventListener('load', getLocalStorage)
@@ -154,6 +180,7 @@ async function getWeather() {
 
   slideNext.addEventListener('click', getSlideNext)
   slidePreview.addEventListener('click', getSlidePrev)
+
   showTime()
   showDate()
   showGreetings()
