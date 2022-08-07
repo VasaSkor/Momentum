@@ -57,6 +57,7 @@ function setLocalStorage() {
   const name = document.querySelector('.name')
   localStorage.setItem('name', name.value);
 }
+
 function getLocalStorage() {
   const name = document.querySelector('.name')
   if(localStorage.getItem('name')) {
