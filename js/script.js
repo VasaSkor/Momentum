@@ -13,6 +13,96 @@ const quoteText = document.querySelector('.quote')
 const quoteAuthor = document.querySelector('.author')
 const quoteChangeButton = document.querySelector('.change-quote')
 let quotes = ''
+const playButton = document.querySelector('.play')
+const nextPlayerButton = document.querySelector('.play-next')
+const previousPlayerButton = document.querySelector('.play-prev')
+const playlistTable = document.querySelector('.play-list')
+
+const trackNames = ["Ennio Morricone", "Aqua Caelestis", "River Flows In You", "Summer Wind"]
+
+
+let isPlayed = false
+let currentTrack = 0
+let playlist = trackNames.map((name) =>
+    new Audio(
+        `https://github.com/VasaSkor/Momentum/blob/momentum/assets/sounds/${
+            name.replaceAll(' ', '%20')
+        }.mp3?raw=true`
+    ))
+let currentAudio = playlist[0]
+
+
+window.addEventListener('load', () => {
+    playlist.forEach((track, index) => {
+        track.load()
+
+        track.addEventListener('canplaythrough', () => {
+            const track = document.createElement('li')
+            track.textContent = trackNames[index]
+
+            if (index == currentTrack)
+                track.classList = 'play-item item-active'
+            else
+                track.classList = 'play-item'
+
+
+            playlistTable.appendChild(track)
+        })
+    })
+})
+
+nextPlayerButton.addEventListener('click', () => {
+    currentTrack++
+    
+    if (currentTrack > playlist.length - 1)
+        currentTrack = 0
+
+    markSelectedTrack()
+    updatePlayerTrack()
+})
+
+previousPlayerButton.addEventListener('click', () => {
+    currentTrack--
+    
+    if (currentTrack < 0)
+        currentTrack = playlist.length - 1
+
+    markSelectedTrack()
+    updatePlayerTrack()
+})
+
+playButton.addEventListener('click', () => {
+    if (isPlayed){
+        currentAudio.pause()
+        playButton.classList = 'play player-icon'
+    }
+    else{
+        currentAudio.play()
+        playButton.classList = 'play player-icon pause'
+    }
+        
+
+    isPlayed = !isPlayed
+})
+
+function updatePlayerTrack() {
+    if (isPlayed === true) {
+        currentAudio.pause()
+        currentAudio = playlist[currentTrack]
+        currentAudio.play()
+    }
+    else {
+        currentAudio = playlist[currentTrack]
+    }
+}
+
+function markSelectedTrack() {
+    for (let i = 0; i < playlistTable.childElementCount; i++) {
+        playlistTable.children[i].classList = 'play-item'
+    }
+
+    playlistTable.children[currentTrack].classList = 'play-item item-active'
+}
 
 function showTime() {
     const time = document.querySelector('.time')
@@ -167,8 +257,7 @@ quoteChangeButton.addEventListener('click', updateQuote)
   window.addEventListener('load', getLocalStorage)
   window.addEventListener('load', () => {
     setTimeout(async () => {
-        const storedCity = localStorage.getItem('city').trim()
-
+        const storedCity = localStorage.getItem('city')
         if (storedCity)
             cityInput.value = storedCity
 
@@ -181,6 +270,7 @@ quoteChangeButton.addEventListener('click', updateQuote)
 
   slideNext.addEventListener('click', getSlideNext)
   slidePreview.addEventListener('click', getSlidePrev)
+
 
   showTime()
   showDate()
