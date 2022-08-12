@@ -1,3 +1,4 @@
+import i18next from 'https://deno.land/x/i18next/index.js'
 let randomNum = Math.floor(Math.random() * 20 + 1).toString().padStart(2, '0')
 let slideNext = document.querySelector('.slide-next')
 let slidePreview = document.querySelector('.slide-prev')
@@ -7,7 +8,6 @@ const weatherDescription = document.querySelector('.weather-description')
 const windSpeed = document.querySelector('.wind')
 const humidity = document.querySelector('.humidity')
 const cityInput = document.querySelector('.city')
-cityInput.value = 'Minsk'
 const weatherError = document.querySelector('.weather-error')
 const quoteText = document.querySelector('.quote')
 const quoteAuthor = document.querySelector('.author')
@@ -17,7 +17,7 @@ const playButton = document.querySelector('.play')
 const nextPlayerButton = document.querySelector('.play-next')
 const previousPlayerButton = document.querySelector('.play-prev')
 const playlistTable = document.querySelector('.play-list')
-
+const progress = document.querySelector('.progress')
 const trackNames = ["Ennio Morricone", "Aqua Caelestis", "River Flows In You", "Summer Wind"]
 
 
@@ -116,8 +116,8 @@ function showTime() {
 function showDate(){
   const date_block = document.querySelector('.date')
   const date = new Date()
-  const options = {weekday: 'long', month: 'long', day: 'numeric'}
-  const currentDate = date.toLocaleDateString('en-US', options);
+  const options = {weekday: 'long', month: 'long', day: 'numeric',}
+  const currentDate = date.toLocaleDateString(i18next.t('currentDate'), options);
   date_block.textContent = currentDate
   setTimeout(showDate, 1000);
   return date_block
@@ -125,21 +125,21 @@ function showDate(){
 
 function showGreetings(){
   const greetings = document.querySelector('.greeting')
-  const arrGreetings = ['morning', 'afternoon', 'evening', 'night']
+  const arrGreetings = [`${i18next.t('morning')}`, `${i18next.t('afternoon')}`, `${i18next.t('evening')}`, `${i18next.t('night')}`]
   const date = new Date()
   const GetHours = date.getHours()
   setTimeout(showGreetings, 1000);
   if(GetHours >= 6 && GetHours <= 11){
-   return greetings.textContent = `Good ${arrGreetings[0]}`
+   return greetings.textContent = `${i18next.t('TextGoogCurrentMorning')} ${arrGreetings[0]}`
   }
   else if(GetHours >= 12 && GetHours <= 17){
-    return greetings.textContent = `Good ${arrGreetings[1]}`
+    return greetings.textContent = `${i18next.t('TextGoogCurrentAfternoon')} ${arrGreetings[1]}`
   }
   else if(GetHours >= 18 && GetHours <= 23){
-    return greetings.textContent = `Good ${arrGreetings[2]}`
+    return greetings.textContent = `${i18next.t('TextGoogCurrentAfternoon')} ${arrGreetings[2]}`
   }
   else if(GetHours >= 0 && GetHours <= 5){
-    return greetings.textContent = `Good ${arrGreetings[3]}`
+    return greetings.textContent = `${i18next.t('TextGoogCurrentNight')} ${arrGreetings[3]}`
   }
 }
 
@@ -149,7 +149,9 @@ function setLocalStorage() {
 }
 
 function getLocalStorage() {
+  let placeholder = document.querySelector('.name').placeholder = i18next.t('placeholder')
   const name = document.querySelector('.name')
+  placeholder = i18next.t('placeholder')
   if(localStorage.getItem('name')) {
     name.value = localStorage.getItem('name');
   }
@@ -209,7 +211,7 @@ cityInput.onkeypress = async (event) => {
 }
 
 async function getWeather() {  
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput.value}&lang=en&appid=08f2a575dda978b9c539199e54df03b0&units=metric`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput.value}&lang=${i18next.t('weather_lang')}&appid=08f2a575dda978b9c539199e54df03b0&units=metric`;
   const res = await fetch(url);
   const data = await res.json(); 
   if(res.ok){
@@ -218,8 +220,8 @@ async function getWeather() {
   weatherIcon.classList.add(`owf-${data.weather[0].id}`)
   temperature.textContent = `${Math.floor(data.main.temp)}°C`
   weatherDescription.textContent = data.weather[0].description
-  windSpeed.textContent = `Wind speed: ${Math.floor(data.wind.speed)} m/s`
-  humidity.textContent = `Humidity: ${Math.floor(data.main.humidity)}%`
+  windSpeed.textContent = i18next.t('weather_wind_speed', {speed: Math.floor(data.wind.speed)})
+  humidity.textContent = i18next.t('Humidity', {humidity: Math.floor(data.main.humidity)})
 }
   else{
         weatherError.textContent = `Error! city not found for '${localStorage.getItem('city')}'!`
@@ -229,16 +231,21 @@ async function getWeather() {
         windSpeed.textContent = ''
         humidity.textContent = ''
   }
+  if (cityInput.value == ''){
+    cityInput.value = i18next.t('cityInputValue')
+  }
 }
 function updateQuote() {
   const quote = quotes[Math.floor(Math.random() * quotes.length)]
 
-  quoteText.textContent = `"${quote['quote']}"`
+  quoteText.textContent = `"${quote['text']}"`
   quoteAuthor.textContent = quote['author']
 }
 
+
 async function getQuotes() {
-  const response = await fetch('https://www.breakingbadapi.com/api/quotes')
+  const response = await fetch('https://raw.githubusercontent.com/rolling-scopes-school/file-storage/random-jokes/quotes.json')
+  
 
   if (response.ok){
       return response.json()
@@ -247,7 +254,6 @@ async function getQuotes() {
 
 window.addEventListener('load', async () => {
   quotes = await getQuotes()
-
   updateQuote()
 })
 
@@ -276,3 +282,47 @@ quoteChangeButton.addEventListener('click', updateQuote)
   showDate()
   showGreetings()
   getWeather()
+
+  window.addEventListener('DOMContentLoaded', async () =>{
+    await i18next.init({
+      lng: navigator.language,
+      debug: false,
+      resources: {
+        en:{
+          translation: {
+            "weather_wind_speed": 'Wind speed: {{speed}} m/s',
+            "weather_lang": 'en',
+            "Humidity": 'Humidity: {{humidity}}%',
+            "cityInputValue": 'Minsk',
+            "placeholder": 'Enter your name',
+            "currentDate": 'en-US',
+            "TextGoogCurrentMorning": 'Good',
+            "TextGoogCurrentAfternoon": 'Good',
+            "TextGoogCurrentNight": 'Good',
+            "morning": 'morning',
+            "afternoon": 'afternoon',
+            "evening": 'evening',
+            "night": 'night',
+          }
+        },
+        ru:{
+          translation:{
+            "weather_wind_speed": "Скорость ветра: {{speed}} м/с",
+            "weather_lang": 'ru',
+            "Humidity": 'Влажность: {{humidity}}%',
+            "cityInputValue": 'Минск',
+            "placeholder": 'Введите своё имя',
+            "currentDate": 'ru-RU',
+            "TextGoogCurrentMorning": 'Доброе',
+            "TextGoogCurrentAfternoon": 'Доброго',
+            "TextGoogCurrentNight": 'Доброй',
+            "morning": 'утро',
+            "afternoon": 'дня',
+            "evening": 'вечера',
+            "night": 'ночи',
+          }
+        }
+      }
+    });
+  })
+
