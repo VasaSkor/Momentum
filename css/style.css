@@ -117,7 +117,51 @@ body {
 .play-next {
   background-image: url("../assets/svg/play-next.svg");
 }
+.player {
+  margin-top: 40px;
+}
 
+
+
+.progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 15%;
+  background-color: #FF940A;
+  z-index: 1;
+}
+
+.times{
+  position: absolute;
+  display: flex;
+  left: 168px;
+  top: 134px;
+
+}
+
+.artSong-header {
+  margin-left: -14px;
+  position: absolute;
+  margin-bottom: -5px;
+  text-align: left;
+  top: 10px;
+  font-family: 'MyriadPro-Regular', "Arial", sans-serif;
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 1px 1px 0 0 #fff;
+}
+
+.duration-player {
+    position: absolute;
+    height: 4px;
+    top: 42px;
+    margin: 0px 10px 0 -19px;
+    min-width: 300px;
+    background-color: #fff;
+    cursor: pointer;
+}
 .weather {
   display: flex;
   flex-direction: column;
