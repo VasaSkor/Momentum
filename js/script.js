@@ -1,5 +1,5 @@
 import i18next from 'https://deno.land/x/i18next/index.js'
-import playList from './playList.js';
+import playList from './audio.js';
 console.log(playList);
 let randomNum = Math.floor(Math.random() * 20 + 1).toString().padStart(2, '0')
 let randomNumAPI = Math.floor(Math.random() * 100 + 1).toString().padStart(2, '0')
@@ -16,6 +16,7 @@ const quoteText = document.querySelector('.quote')
 const quoteAuthor = document.querySelector('.author')
 const quoteChangeButton = document.querySelector('.change-quote')
 let quotes = ''
+let num = 0
 const playButton = document.querySelector('.play')
 const nextPlayerButton = document.querySelector('.play-next')
 const previousPlayerButton = document.querySelector('.play-prev')
@@ -26,9 +27,9 @@ const trackNames = ["Ennio Morricone", "Aqua Caelestis", "River Flows In You", "
 
 
 const audioPlayer = document.querySelector(".player");
-const audio = new Audio(
-  "https://ia800905.us.archive.org/19/items/FREE_background_music_dhalius/FaceBangSonic.mp3"
-);
+let audio = new Audio(
+  `https://github.com/VasaSkor/Momentum/blob/momentum${playList[num].src}?raw=true`
+)
 console.dir(audio);
 audio.addEventListener(
   "loadeddata",
@@ -40,6 +41,15 @@ audio.addEventListener(
   },
   false
 );
+
+function nextSong() {
+num++
+audio.src = `https://github.com/VasaSkor/Momentum/blob/momentum${playList[num].src}?raw=true`
+}
+
+nextPlayerButton.addEventListener('click', nextSong) 
+
+
 
 function getTimeCodeFromNum(num) {
   let seconds = parseInt(num);
